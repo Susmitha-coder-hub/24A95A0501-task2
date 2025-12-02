@@ -1,0 +1,6 @@
+fastapi
+uvicorn[standard]
+cryptography
+pyotp
+requests
+python-dotenv

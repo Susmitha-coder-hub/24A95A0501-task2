@@ -1,0 +1,35 @@
+# docker-compose.yml
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .           # build from current directory (where Dockerfile lives)
+      dockerfile: Dockerfile
+    image: myapp          # optional: name of the resulting image
+    container_name: myapp_container
+    ports:
+      - "8080:8080"       # map host:container
+    environment:
+      - TZ=UTC            # timezone forwarded into container
+    volumes:
+      - seed-data:/data           # persistent data storage for seed, etc.
+      - cron-output:/cron         # cron jobs / cron logs
+      # Optional: mount local key files (example)
+      # Uncomment and adjust if you have these files locally
+      # - ./keys/student_private.pem:/app/student_private.pem:ro
+      # - ./keys/student_public.pem:/app/student_public.pem:ro
+      # - ./keys/instructor_public.pem:/app/instructor_public.pem:ro
+    restart: unless-stopped
+    # healthcheck (optional)
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/ || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  seed-data:
+    driver: local
+  cron-output:
+    driver: local
